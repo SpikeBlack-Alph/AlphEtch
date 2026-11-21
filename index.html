@@ -45,6 +45,7 @@ textarea::placeholder{color:#7F8EA8}
 #status.err{color:#FFB0AA}#status.ok{color:#7BE0AF}
 #status a{color:inherit}
 .hist{min-width:0}
+.lookup{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}.lookup input{flex:1;min-width:200px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--fg);font:inherit}#viewing{font-size:13px;color:var(--slate);margin-bottom:12px;min-height:1px}
 .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
 .tab{border:1px solid var(--line);background:transparent;border-radius:999px;padding:7px 16px;cursor:pointer;font-weight:700;color:var(--slate)}
 .tab[aria-selected=true]{background:var(--btnbg);border-color:var(--btnbg);color:var(--btnfg)}
@@ -91,6 +92,8 @@ textarea::placeholder{color:#7F8EA8}
 
   <section class="hist" aria-labelledby="ht">
     <h2 id="ht" data-i="ht"></h2>
+    <div class="lookup"><input id="addr" data-ph="lookPh" spellcheck="false" autocomplete="off"><button class="btn" id="look" data-i="look"></button><button class="btn" id="mine" hidden data-i="mine"></button></div>
+    <div id="viewing"></div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-f="all" aria-selected="true" data-i="all"></button>
       <button class="tab" role="tab" data-f="in" aria-selected="false" data-i="inn"></button>
@@ -103,16 +106,16 @@ textarea::placeholder{color:#7F8EA8}
 
 <script>
 const T={
-en:{netTest:'Testnet (practice)',connect:'Connect wallet',h1:'Write once. Etched forever.',heroP:'Send a public message to one or more Alephium addresses. It is written into the blockchain: nobody can erase or edit it.',ct:'New message',toL:'Recipients (one address per line)',msgL:'Message',msgPh:'Your public message…',pub:'Plain text, readable by anyone',note:'Each recipient receives 0.001 ALPH along with the message. You also pay the network fee (gas) from your wallet.',send:'Etch the message',ht:'History',all:'All',inn:'Received',out:'Sent',refresh:'Refresh',emptyC:'Connect your wallet to see your sent and received messages.',emptyN:'No messages yet.',loading:'Loading history…',loadErr:'Could not load history: ',from:'Received from ',to:'Sent to ',expl:'View on explorer',install:'Install the Alephium extension',installAfter:' then reload the page.',connFail:'Connection refused or failed: ',confirm:'Confirm the transaction in your wallet…',sentOk:'Message sent. ',viewTx:'View transaction',sendFail:'Could not send: ',rOne:' recipient',rMany:' recipients',inv:' · {n} invalid address(es)',bytes:' bytes'},
-fr:{netTest:'Testnet (essai)',connect:'Connecter mon wallet',h1:'Écris une fois. Gravé pour toujours.',heroP:'Envoie un message public à une ou plusieurs adresses Alephium. Il est inscrit dans la blockchain : personne ne peut l’effacer ni le modifier.',ct:'Nouveau message',toL:'Destinataires (une adresse par ligne)',msgL:'Message',msgPh:'Ton message public…',pub:'Texte en clair, lisible par tous',note:'Chaque destinataire reçoit 0,001 ALPH avec le message. Tu paies aussi les frais de réseau (gas) depuis ton wallet.',send:'Graver le message',ht:'Historique',all:'Tous',inn:'Reçus',out:'Envoyés',refresh:'Actualiser',emptyC:'Connecte ton wallet pour voir tes messages envoyés et reçus.',emptyN:'Aucun message pour l’instant.',loading:'Chargement de l’historique…',loadErr:'Impossible de charger l’historique : ',from:'Reçu de ',to:'Envoyé à ',expl:'Voir sur l’explorateur',install:'Installe l’extension Alephium',installAfter:' puis recharge la page.',connFail:'Connexion refusée ou impossible : ',confirm:'Confirme la transaction dans ton wallet…',sentOk:'Message envoyé. ',viewTx:'Voir la transaction',sendFail:'Envoi impossible : ',rOne:' destinataire',rMany:' destinataires',inv:' · {n} adresse(s) invalide(s)',bytes:' octets'},
-de:{netTest:'Testnet (Probe)',connect:'Wallet verbinden',h1:'Einmal schreiben. Für immer eingraviert.',heroP:'Sende eine öffentliche Nachricht an eine oder mehrere Alephium-Adressen. Sie wird in der Blockchain gespeichert: Niemand kann sie löschen oder ändern.',ct:'Neue Nachricht',toL:'Empfänger (eine Adresse pro Zeile)',msgL:'Nachricht',msgPh:'Deine öffentliche Nachricht…',pub:'Klartext, für alle lesbar',note:'Jeder Empfänger erhält 0,001 ALPH zusammen mit der Nachricht. Die Netzwerkgebühr (Gas) zahlst du aus deinem Wallet.',send:'Nachricht eingravieren',ht:'Verlauf',all:'Alle',inn:'Empfangen',out:'Gesendet',refresh:'Aktualisieren',emptyC:'Verbinde dein Wallet, um gesendete und empfangene Nachrichten zu sehen.',emptyN:'Noch keine Nachrichten.',loading:'Verlauf wird geladen…',loadErr:'Verlauf konnte nicht geladen werden: ',from:'Empfangen von ',to:'Gesendet an ',expl:'Im Explorer ansehen',install:'Installiere die Alephium-Erweiterung',installAfter:' und lade die Seite neu.',connFail:'Verbindung abgelehnt oder fehlgeschlagen: ',confirm:'Bestätige die Transaktion in deinem Wallet…',sentOk:'Nachricht gesendet. ',viewTx:'Transaktion ansehen',sendFail:'Senden nicht möglich: ',rOne:' Empfänger',rMany:' Empfänger',inv:' · {n} ungültige Adresse(n)',bytes:' Bytes'},
-es:{netTest:'Testnet (prueba)',connect:'Conectar wallet',h1:'Escribe una vez. Grabado para siempre.',heroP:'Envía un mensaje público a una o varias direcciones Alephium. Queda inscrito en la blockchain: nadie puede borrarlo ni modificarlo.',ct:'Nuevo mensaje',toL:'Destinatarios (una dirección por línea)',msgL:'Mensaje',msgPh:'Tu mensaje público…',pub:'Texto plano, legible por todos',note:'Cada destinatario recibe 0,001 ALPH junto con el mensaje. Tú pagas además la comisión de red (gas) desde tu wallet.',send:'Grabar el mensaje',ht:'Historial',all:'Todos',inn:'Recibidos',out:'Enviados',refresh:'Actualizar',emptyC:'Conecta tu wallet para ver tus mensajes enviados y recibidos.',emptyN:'Aún no hay mensajes.',loading:'Cargando historial…',loadErr:'No se pudo cargar el historial: ',from:'Recibido de ',to:'Enviado a ',expl:'Ver en el explorador',install:'Instala la extensión de Alephium',installAfter:' y recarga la página.',connFail:'Conexión rechazada o fallida: ',confirm:'Confirma la transacción en tu wallet…',sentOk:'Mensaje enviado. ',viewTx:'Ver la transacción',sendFail:'No se pudo enviar: ',rOne:' destinatario',rMany:' destinatarios',inv:' · {n} dirección(es) no válida(s)',bytes:' bytes'}};
+en:{netTest:'Testnet (practice)',connect:'Connect wallet',h1:'Write once. Etched forever.',heroP:'Send a public message to one or more Alephium addresses. It is written into the blockchain: nobody can erase or edit it.',ct:'New message',toL:'Recipients (one address per line)',msgL:'Message',msgPh:'Your public message…',pub:'Plain text, readable by anyone',note:'Each recipient receives 0.001 ALPH along with the message. You also pay the network fee (gas) from your wallet.',send:'Etch the message',ht:'History',all:'All',inn:'Received',out:'Sent',refresh:'Refresh',emptyC:'Connect your wallet or look up an address to see sent and received messages.',emptyN:'No messages yet.',loading:'Loading history…',loadErr:'Could not load history: ',from:'Received from ',to:'Sent to ',expl:'View on explorer',install:'Install the Alephium extension',installAfter:' then reload the page.',connFail:'Connection refused or failed: ',confirm:'Confirm the transaction in your wallet…',sentOk:'Message sent. ',viewTx:'View transaction',sendFail:'Could not send: ',rOne:' recipient',rMany:' recipients',inv:' · {n} invalid address(es)',bytes:' bytes',lookPh:'Look up any Alephium address…',look:'Look up',mine:'My wallet',viewing:'Viewing: ',badAddr:'Invalid address.'},
+fr:{netTest:'Testnet (essai)',connect:'Connecter mon wallet',h1:'Écris une fois. Gravé pour toujours.',heroP:'Envoie un message public à une ou plusieurs adresses Alephium. Il est inscrit dans la blockchain : personne ne peut l’effacer ni le modifier.',ct:'Nouveau message',toL:'Destinataires (une adresse par ligne)',msgL:'Message',msgPh:'Ton message public…',pub:'Texte en clair, lisible par tous',note:'Chaque destinataire reçoit 0,001 ALPH avec le message. Tu paies aussi les frais de réseau (gas) depuis ton wallet.',send:'Graver le message',ht:'Historique',all:'Tous',inn:'Reçus',out:'Envoyés',refresh:'Actualiser',emptyC:'Connecte ton wallet ou cherche une adresse pour voir les messages envoyés et reçus.',emptyN:'Aucun message pour l’instant.',loading:'Chargement de l’historique…',loadErr:'Impossible de charger l’historique : ',from:'Reçu de ',to:'Envoyé à ',expl:'Voir sur l’explorateur',install:'Installe l’extension Alephium',installAfter:' puis recharge la page.',connFail:'Connexion refusée ou impossible : ',confirm:'Confirme la transaction dans ton wallet…',sentOk:'Message envoyé. ',viewTx:'Voir la transaction',sendFail:'Envoi impossible : ',rOne:' destinataire',rMany:' destinataires',inv:' · {n} adresse(s) invalide(s)',bytes:' octets',lookPh:'Chercher une adresse Alephium…',look:'Chercher',mine:'Mon wallet',viewing:'Adresse affichée : ',badAddr:'Adresse invalide.'},
+de:{netTest:'Testnet (Probe)',connect:'Wallet verbinden',h1:'Einmal schreiben. Für immer eingraviert.',heroP:'Sende eine öffentliche Nachricht an eine oder mehrere Alephium-Adressen. Sie wird in der Blockchain gespeichert: Niemand kann sie löschen oder ändern.',ct:'Neue Nachricht',toL:'Empfänger (eine Adresse pro Zeile)',msgL:'Nachricht',msgPh:'Deine öffentliche Nachricht…',pub:'Klartext, für alle lesbar',note:'Jeder Empfänger erhält 0,001 ALPH zusammen mit der Nachricht. Die Netzwerkgebühr (Gas) zahlst du aus deinem Wallet.',send:'Nachricht eingravieren',ht:'Verlauf',all:'Alle',inn:'Empfangen',out:'Gesendet',refresh:'Aktualisieren',emptyC:'Verbinde dein Wallet oder suche eine Adresse, um gesendete und empfangene Nachrichten zu sehen.',emptyN:'Noch keine Nachrichten.',loading:'Verlauf wird geladen…',loadErr:'Verlauf konnte nicht geladen werden: ',from:'Empfangen von ',to:'Gesendet an ',expl:'Im Explorer ansehen',install:'Installiere die Alephium-Erweiterung',installAfter:' und lade die Seite neu.',connFail:'Verbindung abgelehnt oder fehlgeschlagen: ',confirm:'Bestätige die Transaktion in deinem Wallet…',sentOk:'Nachricht gesendet. ',viewTx:'Transaktion ansehen',sendFail:'Senden nicht möglich: ',rOne:' Empfänger',rMany:' Empfänger',inv:' · {n} ungültige Adresse(n)',bytes:' Bytes',lookPh:'Beliebige Alephium-Adresse suchen…',look:'Suchen',mine:'Mein Wallet',viewing:'Angezeigt: ',badAddr:'Ungültige Adresse.'},
+es:{netTest:'Testnet (prueba)',connect:'Conectar wallet',h1:'Escribe una vez. Grabado para siempre.',heroP:'Envía un mensaje público a una o varias direcciones Alephium. Queda inscrito en la blockchain: nadie puede borrarlo ni modificarlo.',ct:'Nuevo mensaje',toL:'Destinatarios (una dirección por línea)',msgL:'Mensaje',msgPh:'Tu mensaje público…',pub:'Texto plano, legible por todos',note:'Cada destinatario recibe 0,001 ALPH junto con el mensaje. Tú pagas además la comisión de red (gas) desde tu wallet.',send:'Grabar el mensaje',ht:'Historial',all:'Todos',inn:'Recibidos',out:'Enviados',refresh:'Actualizar',emptyC:'Conecta tu wallet o busca una dirección para ver los mensajes enviados y recibidos.',emptyN:'Aún no hay mensajes.',loading:'Cargando historial…',loadErr:'No se pudo cargar el historial: ',from:'Recibido de ',to:'Enviado a ',expl:'Ver en el explorador',install:'Instala la extensión de Alephium',installAfter:' y recarga la página.',connFail:'Conexión rechazada o fallida: ',confirm:'Confirma la transacción en tu wallet…',sentOk:'Mensaje enviado. ',viewTx:'Ver la transacción',sendFail:'No se pudo enviar: ',rOne:' destinatario',rMany:' destinatarios',inv:' · {n} dirección(es) no válida(s)',bytes:' bytes',lookPh:'Buscar cualquier dirección Alephium…',look:'Buscar',mine:'Mi wallet',viewing:'Mostrando: ',badAddr:'Dirección no válida.'}};
 const LOC={en:'en-GB',fr:'fr-FR',de:'de-DE',es:'es-ES'};
 const API={mainnet:'https://backend.mainnet.alephium.org',testnet:'https://backend.testnet.alephium.org'};
 const EXP={mainnet:'https://explorer.alephium.org',testnet:'https://testnet.alephium.org'};
 const DUST='1000000000000000',MAX=200;
 const $=id=>document.getElementById(id);
-let wallet=null,acct=null,items=[],filter='all',lang='en',loadErr='';
+let wallet=null,acct=null,items=[],filter='all',lang='en',loadErr='',viewAddr=null;
 try{lang=localStorage.getItem('alphetch-lang')||'en'}catch(e){}
 if(!T[lang])lang='en';
 const t=k=>T[lang][k];
@@ -130,7 +133,7 @@ function applyLang(){
   document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
   document.querySelectorAll('[data-ph]').forEach(e=>e.placeholder=t(e.dataset.ph));
   $('connect').textContent=acct?short(acct.address):t('connect');
-  refreshForm();render();
+  updateView();refreshForm();render();
 }
 $('lang').onchange=e=>{lang=e.target.value;try{localStorage.setItem('alphetch-lang',lang)}catch(x){}applyLang()};
 
@@ -138,6 +141,15 @@ function setTheme(v){document.documentElement.dataset.theme=v;$('theme').textCon
 $('theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 setTheme(document.documentElement.dataset.theme);
 
+const target=()=>viewAddr||(acct&&acct.address);
+function updateView(){$('viewing').textContent=viewAddr?t('viewing')+viewAddr:'';$('mine').hidden=!viewAddr;$('refresh').disabled=!target()}
+function lookup(){
+  const a=$('addr').value.trim();if(!a)return;
+  if(!isAddr(a)){viewAddr=null;items=[];loadErr=t('badAddr');updateView();render();return}
+  viewAddr=a;loadErr='';updateView();load();
+}
+$('look').onclick=lookup;$('addr').onkeydown=e=>{if(e.key==='Enter')lookup()};
+$('mine').onclick=()=>{viewAddr=null;$('addr').value='';items=[];loadErr='';updateView();if(acct)load();else render()};
 function refreshForm(){
   const r=recips(),n=bytes($('msg').value),bad=r.filter(a=>!isAddr(a));
   $('cnt').textContent=r.length+(r.length>1?t('rMany'):t('rOne'))+(bad.length?t('inv').replace('{n}',bad.length):'');
@@ -152,16 +164,16 @@ async function connect(){
     const f=document.createElement('span');f.append(a,t('installAfter'));say(f,'err');return}
   try{
     acct=await w.unsafeEnable({networkId:$('net').value,onDisconnected:()=>reset()});
-    wallet=w;$('connect').textContent=short(acct.address);$('refresh').disabled=false;
-    say('');refreshForm();load();
+    wallet=w;viewAddr=null;$('connect').textContent=short(acct.address);
+    say('');refreshForm();updateView();load();
   }catch(e){say(t('connFail')+(e.message||e),'err')}
 }
-function reset(){wallet=acct=null;items=[];loadErr='';$('connect').textContent=t('connect');$('refresh').disabled=true;refreshForm();render()}
+function reset(){wallet=acct=null;viewAddr=null;items=[];loadErr='';$('connect').textContent=t('connect');updateView();refreshForm();render()}
 $('connect').onclick=()=>acct?reset():connect();
-$('net').onchange=()=>{if(acct)reset()};
+$('net').onchange=()=>{if(acct)reset();else if(viewAddr)load()};
 
 async function load(){
-  const net=$('net').value,me=acct.address;let all=[];loadErr='';
+  const net=$('net').value,me=target();if(!me)return;let all=[];loadErr='';
   $('list').innerHTML='';const ld=document.createElement('div');ld.className='empty';ld.textContent=t('loading');$('list').append(ld);
   try{
     for(let p=1;p<=40;p++){
@@ -169,7 +181,7 @@ async function load(){
       if(!r.ok)throw new Error('HTTP '+r.status);
       const j=await r.json();all=all.concat(j);if(j.length<100)break;
     }
-  }catch(e){loadErr=e.message;items=[];render();return}
+  }catch(e){loadErr=t('loadErr')+e.message;items=[];render();return}
   const out=[];
   for(const tx of all){
     const from=tx.inputs&&tx.inputs[0]&&tx.inputs[0].address,groups={};
@@ -186,7 +198,7 @@ async function load(){
 function render(){
   const L=$('list');L.innerHTML='';
   const v=items.filter(i=>filter==='all'||i.dir===filter);
-  if(loadErr||!v.length){const d=document.createElement('div');d.className='empty';d.textContent=loadErr?t('loadErr')+loadErr:(acct?t('emptyN'):t('emptyC'));L.append(d);return}
+  if(loadErr||!v.length){const d=document.createElement('div');d.className='empty';d.textContent=loadErr||((acct||viewAddr)?t('emptyN'):t('emptyC'));L.append(d);return}
   for(const i of v){
     const el=document.createElement('article');el.className='item '+i.dir;
     const top=document.createElement('div');top.className='top';
@@ -200,7 +212,7 @@ function render(){
   }
 }
 document.querySelectorAll('.tab').forEach(x=>x.onclick=()=>{filter=x.dataset.f;document.querySelectorAll('.tab').forEach(y=>y.setAttribute('aria-selected',y===x));render()});
-$('refresh').onclick=()=>acct&&load();
+$('refresh').onclick=()=>load();
 
 $('send').onclick=async()=>{
   const r=recips(),m=$('msg').value.trim();$('send').disabled=true;say(t('confirm'));
@@ -209,7 +221,7 @@ $('send').onclick=async()=>{
       destinations:r.map(a=>({address:a,attoAlphAmount:DUST,message:toHex(m)}))});
     const a=document.createElement('a');a.href=EXP[$('net').value]+'/transactions/'+res.txId;a.target='_blank';a.rel='noopener';a.textContent=t('viewTx');
     const f=document.createElement('span');f.append(t('sentOk'),a);say(f,'ok');
-    $('msg').value='';refreshForm();setTimeout(()=>acct&&load(),25000);
+    $('msg').value='';refreshForm();setTimeout(()=>{if(acct&&!viewAddr)load()},25000);
   }catch(e){say(t('sendFail')+(e.message||e),'err');refreshForm()}
 };
 applyLang();
