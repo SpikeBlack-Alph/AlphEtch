@@ -123,6 +123,7 @@ try{lang=localStorage.getItem('alphetch-lang')||'en'}catch(e){}
 if(!T[lang])lang='en';
 const t=k=>T[lang][k];
 
+const norm=a=>a?String(a).split(':')[0]:a;
 const short=a=>a.slice(0,6)+'…'+a.slice(-5);
 const toHex=s=>[...new TextEncoder().encode(s)].map(b=>b.toString(16).padStart(2,'0')).join('');
 function fromHex(h){try{const b=new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));return new TextDecoder('utf-8',{fatal:true}).decode(b)}catch{return null}}
@@ -187,11 +188,11 @@ async function load(){
   }catch(e){loadErr=t('loadErr')+e.message;items=[];render();return}
   const out=[];
   for(const tx of all){
-    const from=tx.inputs&&tx.inputs[0]&&tx.inputs[0].address,groups={};
+    const from=norm(tx.inputs&&tx.inputs[0]&&tx.inputs[0].address),groups={};
     for(const o of tx.outputs||[]){
       const raw=o.message||o.additionalData;if(!raw)continue;const text=fromHex(raw);if(!text||!text.trim())continue;
-      if(from===me){(groups[text]=groups[text]||[]).push(o.address)}
-      else if(o.address===me){out.push({dir:'in',peers:[from||'?'],text,tx:tx.hash,ts:tx.timestamp})}
+      if(from===me){(groups[text]=groups[text]||[]).push(norm(o.address))}
+      else if(norm(o.address)===me){out.push({dir:'in',peers:[from||'?'],text,tx:tx.hash,ts:tx.timestamp})}
     }
     for(const text in groups){const peers=[...new Set(groups[text])];out.push({dir:'out',peers,text,tx:tx.hash,ts:tx.timestamp})}
   }
